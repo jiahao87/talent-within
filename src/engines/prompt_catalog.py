@@ -74,4 +74,9 @@ user_prompt_relevant_experience = """Job Description:
 {jd_data}
 
 Resume:
-{job_history}"""
+{resume}"""
+
+system_prompt_match_ksa = """You are an experienced recruiter. Read the job requirements and the candidate's job history below. Match the relevant skills of the candidate to the job requirements.
+Output the matching results in JSON format, with the keys being the job requirements and the values being candidate's relevant skills.
+Be concise. If not relevant candidate skill, the value is None.
+"""

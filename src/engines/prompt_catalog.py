@@ -15,6 +15,27 @@ system_prompt_jd_extraction = """You are an experienced recruiter. Read the job 
     }
 """
 
+system_prompt_jd_summarize = """You are an experienced recruiter. Read the job requirements extracted below and summarize the skill requirements where possible.
+If there are multiple skills grouped together in a single string, break them up.
+If there are shortforms, spell them in full.
+
+Example:
+Job Requirements
+{
+    "technical_skill": ["Solid experience in Data Analytics and Machine Learning"],
+    "non_technical_skill": ["Excellent communication skills"],
+    "domain_knowledge": ["Excellent understanding in FX"],
+    "language": ["Fluent in Japanese"]
+}
+Summarized Output
+{
+    "technical_skill": ["Data Analytics", "Machine Learning"],
+    "non_technical_skill": ["Communication"],
+    "domain_knowledge": ["Understanding in Forex"],
+    "language": ["Japanese"]
+}
+"""
+
 user_prompt_jd_extraction = """Extract details from this Job Description:
 {jd}"""
 
@@ -45,11 +66,12 @@ user_prompt_cv_experience = """Job history:
 {job_history}
 """
 
-# prompt_cv_experience = """You are an experienced recruiter. Read the job description and the candidate's job history below. Calculate the candidate's total number of relevant years of experience. 
-# Assume "Present" is {now}. Provide final answer in the format {{"years_of_experience": }}.Think step by step.
-# Job Description:
-# {jd_data}
+system_prompt_relevant_experience = """You are an experienced recruiter. Read the job description and the candidate's job history below. Calculate the candidate's total number of relevant years of experience. Ignore internships and teaching/research roles.
+Check whether the company is Nomura. If not, assume "Present" is {last_hire_date}, else present is {now}. Provide final answer in the format {{"years_of_experience": }}.Think step by step.
+"""
 
-# Resume:
-# {job_history}
-# """
+user_prompt_relevant_experience = """Job Description:
+{jd_data}
+
+Resume:
+{job_history}"""

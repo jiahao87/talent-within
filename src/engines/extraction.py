@@ -43,6 +43,14 @@ class ExtractionEngine:
         jd_data_str = self.extract_json(jd_data_str)
         jd_data_json = json.loads(jd_data_str)
         jd_data_json['filepath'] = filepath
+        refined_jd_str = self.llm.generate(user_prompt_jd_extraction.format(jd=jd_data_str), system_prompt_jd_summarize)
+        refined_jd_str = self.extract_json(refined_jd_str)
+        refined_jd_json = json.loads(refined_jd_str)
+        print(refined_jd_json)
+        ksa_list = [str(jd_data_json['years_of_experience']) + " years of experience"]
+        for key in list(refined_jd_json.keys()):
+            ksa_list.extend(refined_jd_json[key])
+        jd_data_json['ksa'] = ksa_list
         return jd_data_json
     
     def extract_cv_from_folder(self, folder_path="../data/CV"):

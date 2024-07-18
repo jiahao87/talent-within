@@ -5,6 +5,7 @@ import os
 
 from engines.llm_generator import Generator
 from engines.extraction import ExtractionEngine
+# from engines.scoring import ScoringEngine
 from utils.load_config import load_config
 from utils.load_env_var import load_env_var
 
@@ -41,6 +42,10 @@ def extract_cv(filepath: Filepath):
 def extract_all_cv():   
     cv_json = extraction_engine.extract_cv_from_folder()
     return cv_json
+
+@app.post("/talent-matching")
+def talent_matching():
+    pass
 
     
 if __name__ == '__main__':

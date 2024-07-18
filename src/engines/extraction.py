@@ -64,6 +64,7 @@ class ExtractionEngine:
         last_hire_date = self.retrieve_last_hire_date(employee_id)
         experience_years = self.extract_experience(cv_data_json, last_hire_date)
         cv_data_json['years_of_experience'] = str(experience_years)
+        cv_data_json['employee_id'] = employee_id
         cv_data_json['filepath'] = filepath
         return cv_data_json
     
@@ -74,9 +75,9 @@ class ExtractionEngine:
         user_prompt = user_prompt_cv_experience.format(last_hire_date=last_hire_date, job_history=job_history)
         experience_str = self.llm.generate(user_prompt, system_prompt)
         pattern = r'\{[^{}]*"years_of_experience"[^{}]*\}'
-        match = re.search(pattern, experience_str)
+        match = re.findall(pattern, experience_str)
         if match:
-            years_of_experience_str = match.group()
+            years_of_experience_str = match[-1]
             years_of_experience_json = json.loads(years_of_experience_str)
             years_of_experience = years_of_experience_json['years_of_experience']
         else:

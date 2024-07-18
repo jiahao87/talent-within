@@ -4,6 +4,7 @@ system_prompt_jd_extraction = """You are an experienced recruiter. Read the job 
     "job_id": "<fill in job ID that is usually located beside the Job title and in numbers only>"
     "job_title": "<fill in job title>",
     "corporate_title": "<fill in one of values - Analyst, Associate, Vice President, Executive Director or Managing Director. Default Analyst.>",
+    "country": "<fill in country location of the job, default is Singapore>",
     "job_description": "<fill in summarized job description based on function overview and job responsibilities>",
     "education": "<fill in education requirement>",
     "years_of_experience": "<fill in minimum years of experience required in integers only>",
@@ -21,6 +22,7 @@ system_prompt_cv_extraction = """You are an experienced recruiter. Read the cand
 {
     "education": "<fill in highest education attained>",
     "job_history": [{{"job_title": "<fill in job title1>", "company": "<fill in company1>", "job_period": "<fill in date range of job>", "job_description": "<fill in job_description1>"}}, {{<fill in for more jobs if any>}}],
+    "technical_skill": [<fill in list of all technical skills and professional knowledge>],
     "certification": [<fill in list of all certification obtained>],
     "language": [<fill in list of proficient languages, if any>]
     }

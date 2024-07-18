@@ -47,7 +47,7 @@ class ExtractionEngine:
         refined_jd_str = self.extract_json(refined_jd_str)
         refined_jd_json = json.loads(refined_jd_str)
         print(refined_jd_json)
-        ksa_list = [str(jd_data_json['years_of_experience']) + " years of experience"]
+        ksa_list = ["min " + str(jd_data_json['years_of_experience']) + " years of experience"]
         for key in list(refined_jd_json.keys()):
             ksa_list.extend(refined_jd_json[key])
         jd_data_json['ksa'] = ksa_list
@@ -72,6 +72,7 @@ class ExtractionEngine:
         last_hire_date = self.retrieve_last_hire_date(employee_id)
         experience_years = self.extract_experience(cv_data_json, last_hire_date)
         cv_data_json['years_of_experience'] = str(experience_years)
+        cv_data_json['last_hire_date'] = last_hire_date
         cv_data_json['employee_id'] = employee_id
         cv_data_json['filepath'] = filepath
         return cv_data_json

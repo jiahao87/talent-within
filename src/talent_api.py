@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import List
 import uvicorn
 import os
 
 from engines.llm_generator import Generator
 from engines.extraction import ExtractionEngine
-# from engines.scoring import ScoringEngine
+from engines.scoring import ScoringEngine
 from utils.load_config import load_config
 from utils.load_env_var import load_env_var
 
@@ -19,6 +20,24 @@ extraction_engine = ExtractionEngine(config, llm_generator)
 
 
 class Filepath(BaseModel):
+    filepath: str
+
+
+class JDdetails(BaseModel):
+    job_id: str
+    job_title: str
+    corporate_title: str
+    country: str
+    hiring_manager: str
+    job_description: str
+    ksa: List[str]
+    ksa_reviewed: List[str]
+    education: str
+    years_of_experience: str
+    technical_skill: List[str]
+    non_technical_skill: List[str]
+    domain_knowledge: List[str]
+    language: List[str]
     filepath: str
 
     
@@ -44,8 +63,8 @@ def extract_all_cv():
     return cv_json
 
 @app.post("/talent-matching")
-def talent_matching():
-    pass
+def talent_matching(jd: JDdetails):
+    print(jd.dict())
 
     
 if __name__ == '__main__':

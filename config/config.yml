@@ -19,6 +19,6 @@ model:
 
 data:
   employees_master_data: "../data/master_data.xlsx"
-  cv_data: "../data/cv_data.csv"
+  cv_data: "../data/cv_data.xlsx"
   jobs_data: "../data/jobs.csv"
   results_data: "../data/results.csv"

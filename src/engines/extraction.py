@@ -5,6 +5,7 @@ from datetime import datetime
 import re
 from pathlib import Path
 import os
+from openpyxl import load_workbook
 
 from engines.prompt_catalog import *
 
@@ -22,10 +23,22 @@ class ExtractionEngine:
             text += page.get_text()
         return text
     
-    def save_extracted_data(self, df, output_path=None):
+    def save_extracted_data(self, df, output_path=None, sheetname="cv_data"):
         if output_path is None:
             output_path=self.config['data']['cv_data']
-        df.to_csv(output_path, mode='a', header=not os.path.exists(output_path), index=False)
+
+        if os.path.exists(output_path):
+
+            cv_file = load_workbook(output_path, enumerate)
+            sheet = cv_file[sheetname]
+            row_count = sheet.max_row
+            cv_file.close()
+
+            with pd.ExcelWriter(output_path, mode='a', if_sheet_exists='overlay') as writer:  
+                df.to_excel(writer,sheet_name=sheetname, startrow=row_count, index=False, header= False)
+            
+        else:
+            df.to_excel(output_path, sheet_name=sheetname, index=False)
     
     @staticmethod
     def extract_json(text):

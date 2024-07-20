@@ -26,6 +26,13 @@
   
   5) download the apache maven version : 3.9.8 for windows from https://maven.apache.org/download.cgi?.
 
+    Maven set up :
+      From IntelliJ IDE :  File - >setting-> Build, Execution,Deployment->Build Tools-> Maven
+      User Setting file = Give your maven settings.xml
+      Local Repository = Create Maven Repo directory and give path.
+   
+   
+
 ### Steps to Run Application
 1. Git clone repository to local environment
 * Visit [GitHub page](https://github.com/jiahao87/talent-within/tree/main) and copy repository URL from GitHub (Note: If repository has already been cloned, refer to section below on steps to update existing repository)<break>

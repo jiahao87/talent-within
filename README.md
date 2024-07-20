@@ -20,7 +20,7 @@
 
   2) download the code from https://github.com/jiahao87/talent-within   (master branch)
   
-  3)download the Intellij IDE Community version (2024.1.4) https://www.jetbrains.com/idea/download/?fromIDE=&section=windows
+  3) download the Intellij IDE Community version (2024.1.4) https://www.jetbrains.com/idea/download/?fromIDE=&section=windows
   
   4) download the postman https://www.postman.com/downloads/
   

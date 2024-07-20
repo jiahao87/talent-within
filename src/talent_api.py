@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from typing import List
 import uvicorn
@@ -17,6 +17,7 @@ app = FastAPI(docs_url="/doc")
 
 llm_generator = Generator(config)
 extraction_engine = ExtractionEngine(config, llm_generator)
+scoring_engine = ScoringEngine(config, llm_generator)
 
 
 class Filepath(BaseModel):
@@ -64,8 +65,8 @@ def extract_all_cv():
 
 @app.post("/talent-matching")
 def talent_matching(jd: JDdetails):
-    print(jd.dict())
-
+    candidate_results = scoring_engine.score_all_candidates(jd.dict())
+    return status.HTTP_200_OK
     
 if __name__ == '__main__':
     uvicorn.run(app, port=config['api']['port'], host=config['api']['url'], workers=config['api']['workers_num'])

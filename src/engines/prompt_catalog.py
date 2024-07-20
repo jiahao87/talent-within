@@ -78,5 +78,20 @@ Resume:
 
 system_prompt_match_ksa = """You are an experienced recruiter. Read the job requirements and the candidate's job history below. Match the relevant skills of the candidate to the job requirements.
 Output the matching results in JSON format, with the keys being the job requirements and the values being candidate's relevant skills.
-Be concise. If not relevant candidate skill, the value is None.
+Be concise. If not relevant candidate skill, the value is null.
+
+Example
+Job Description:
+["min 3 years of experience", "Data Analytics", "Machine Learning"]
+Resume:
+{{
+    "relevant_years_of_experience": "5 year(s) of relevant experience",
+    "ksa_reviewed": ["Data Science", "AI"]
+    }}
+Output:
+{{
+    "min 3 years of experience": "5 year(s) of relevant experience",
+    "Data Analytics": "Data Science",
+    "Machine Learning": "AI"
+}}
 """

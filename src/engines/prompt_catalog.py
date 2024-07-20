@@ -79,6 +79,7 @@ Resume:
 system_prompt_match_ksa = """You are an experienced recruiter. Read the job requirements and the candidate's job history below. Match the relevant skills of the candidate to the job requirements.
 Output the matching results in JSON format, with the keys being the job requirements and the values being candidate's relevant skills.
 Be concise. If not relevant candidate skill, the value is null.
+When matching "experience", if the candidate's relevant years of experience is less than job requirement's, the value is null.
 
 Example
 Job Description:

@@ -1,0 +1,16 @@
+name: talent-within
+dependencies:
+  - python >=3.9,<3.11
+  - boto3
+  - fastapi
+  - numpy
+  - openpyxl
+  - pandas
+  - pip
+  - python-dotenv
+  - scipy
+  - uvicorn
+  - pip:
+    - PyMuPDF
+    - transformers
+    - torch

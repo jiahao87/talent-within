@@ -24,7 +24,7 @@
   
   4) download the postman https://www.postman.com/downloads/
   
-  5)download the apache maven version : 3.9.8 for windows from https://maven.apache.org/download.cgi?.
+  5) download the apache maven version : 3.9.8 for windows from https://maven.apache.org/download.cgi?.
 
 ### Steps to Run Application
 1. Git clone repository to local environment

@@ -10,7 +10,16 @@
 2. Git
 * Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) which is a version control system (VCS) that tracks changes to computer files, especially source code, during software development
 3. Java
-* {placeholder for instructions}
+
+ By  Vikas : - Download JDK  from https://www.azul.com/downloads/?package=jdk#zulu
+            Version : 17.0.11+9  for Windows platform.
+            17.0.11+9
+            Azul Zulu: 17.50.19
+
+  download the code from https://github.com/jiahao87/talent-within   (master branch)
+  download the Intellij IDE Community version (2024.1.4) https://www.jetbrains.com/idea/download/?fromIDE=&section=windows
+  download the postman https://www.postman.com/downloads/
+  download the apache maven version : 3.9.8 for windows from https://maven.apache.org/download.cgi?.
 
 ### Steps to Run Application
 1. Git clone repository to local environment

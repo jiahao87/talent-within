@@ -47,6 +47,8 @@ conda activate talent-within
 cd src
 python talent_api.py
 ``` 
+Upon success, you may visit ```http://0.0.0.0:8502/doc``` to view the FastAPI documentation page, where you can try out the API endpoints.
+![FastAPI Documentation](assets/images/python_api.png)
 
 ## Steps to Push Code to GitHub
 1. Continuing from step 4 of "Getting Started", execute the following command to create a new branch, replacing "your branch name" with a suitable name of your own.

@@ -10,7 +10,9 @@ dependencies:
   - python-dotenv
   - scipy
   - uvicorn
+  - yaml
   - pip:
     - PyMuPDF
-    - transformers
-    - torch
+    - PyYAML
+    # - transformers
+    # - torch

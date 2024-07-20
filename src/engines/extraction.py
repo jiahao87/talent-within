@@ -60,10 +60,15 @@ class ExtractionEngine:
         refined_jd_str = self.extract_json(refined_jd_str)
         refined_jd_json = json.loads(refined_jd_str)
         print(refined_jd_json)
-        ksa_list = ["min " + str(jd_data_json['years_of_experience']) + " years of experience"]
+        if 'years_of_experience' in jd_data_json: 
+            ksa_list = ["min " + str(jd_data_json['years_of_experience']) + " years of experience"]
+            del jd_data_json['years_of_experience']
         for key in list(refined_jd_json.keys()):
-            ksa_list.extend(refined_jd_json[key])
-        jd_data_json['ksa'] = ksa_list
+            if isinstance(refined_jd_json[key], (list, tuple)):
+                ksa_list.extend(refined_jd_json[key])
+            else:
+                ksa_list.append(refined_jd_json[key])
+        jd_data_json['ksa'] = list(set(ksa_list))
         return jd_data_json
     
     def extract_cv_from_folder(self, folder_path="../data/CV"):

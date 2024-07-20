@@ -78,7 +78,7 @@ class ScoringEngine:
                     match_ksa.append(v)
             total_requirements += 1
         score = min(num_matches / total_requirements, 1)
-        return score, match_ksa
+        return score, list(set(match_ksa))
 
     def calculate_relevant_experience(self, jd, job_history, last_hire_date):
         now = datetime.now().strftime("%d %b %Y")

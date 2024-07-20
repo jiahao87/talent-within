@@ -32,7 +32,9 @@ class Generator:
                     "anthropic_version": self.anthropic_version,
                     "max_tokens": self.max_tokens,
                     "system": system_prompt,
-                    "messages": messages
+                    "messages": messages,
+                    "temperature": self.config['model']['llm']['temperature'],
+                    "top_k": self.config['model']['llm']['top_k'],
                 }
             )
 

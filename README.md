@@ -28,7 +28,7 @@
 
 ### Steps to Run Application
 1. Git clone repository to local environment
-* Visit [GitHub page](https://github.com/jiahao87/talent-within/tree/main) and copy repository URL from GitHub <break>
+* Visit [GitHub page](https://github.com/jiahao87/talent-within/tree/main) and copy repository URL from GitHub (Note: If repository has already been cloned, refer to section below on steps to update existing repository)<break>
 ![Repo URL screenshot](assets/images/repo_url.png)
 
 2. In your local environment, navigate to a folder that you would like to copy the code repository to, perform a right mouse click and click on "Git Bash Here" <break>
@@ -63,6 +63,13 @@ python talent_api.py
 ``` 
 Upon success, you may visit ```http://0.0.0.0:8502/doc``` to view the FastAPI documentation page, where you can try out the API endpoints.
 ![FastAPI Documentation](assets/images/python_api.png)
+
+### Steps to Update Local Repository
+
+If you have already cloned the repository to your local environment, you can update your local repository by performing the command in Git Bash terminal:
+```
+git pull origin main
+```
 
 ## Steps to Push Code to GitHub
 1. Continuing from step 4 of "Getting Started", execute the following command to create a new branch, replacing "your branch name" with a suitable name of your own.

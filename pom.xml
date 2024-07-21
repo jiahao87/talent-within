@@ -12,7 +12,7 @@
      <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
         <aws.sdk.version>2.25.64</aws.sdk.version>
-	<java.version>17</java.version>
+		<java.version>17</java.version>
      </properties>
 
      <dependencyManagement>
@@ -32,19 +32,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>RestService</name>
 	<description>Integration Layer for AWS</description>
-	<url/>
-	<licenses>
-	   	<license/>
-	</licenses>
-	<developers>
-	 	 <developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
 
 
 	<dependencies>
@@ -60,20 +47,20 @@
 		</dependency>
 
 		<dependency>
-  		 	 <groupId>org.apache.commons</groupId>
-    			 <artifactId>commons-lang3</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
 		<dependency> 
-    			<groupId>org.springframework.boot</groupId> 
-    			<artifactId>spring-boot-starter-log4j2</artifactId> 
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
 
-	       <dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.30</version>
-	       </dependency>
+		</dependency>
 
 		<dependency>
 			<groupId>net.minidev</groupId>
@@ -103,7 +90,6 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.2.2</version>
 		</dependency>
-
 
 	</dependencies>
 

@@ -16,6 +16,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 @Service
@@ -35,7 +37,7 @@ public class EmployeeBOImpl implements EmployeeBO {
 
 
     public  FileUploadResponse jdSubmit(String payload)  throws Exception  {
-        String jsonResponse = callPythonEndpoint( payload, AppConstant.PYTHON_TALENT_MATCHING_ENDPOINT_URL);
+        String jsonResponse = callAsynchPythonEndpoint( payload, AppConstant.PYTHON_TALENT_MATCHING_ENDPOINT_URL);
         FileUtil fileUtil= new FileUtil();
         String jdId = fileUtil.getStringJsonValueFromString(payload,"$.job_id");
         String jobTitle = fileUtil.getStringJsonValueFromString(payload,"$.job_title");
@@ -91,6 +93,20 @@ public class EmployeeBOImpl implements EmployeeBO {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.postForEntity(endpointUrl, requestEntity, String.class);
         return response.getBody();
+    }
+
+    public String callAsynchPythonEndpoint(String requestJson, String endpointUrl)  throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(requestJson,headers);
+
+        executor.submit(() -> {
+            ResponseEntity<String> response = restTemplate.postForEntity(endpointUrl, requestEntity, String.class);
+        });
+        executor.shutdown();
+        return "";
     }
 
 }

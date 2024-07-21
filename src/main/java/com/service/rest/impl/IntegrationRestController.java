@@ -34,8 +34,7 @@ public class IntegrationRestController {
 
 
     @PostMapping("/jd-submit")
-    public ResponseEntity<FileUploadResponse>  jdSubmit(@RequestBody  String jsonstr)
-            throws Exception {
+    public ResponseEntity<FileUploadResponse>  jdSubmit(@RequestBody  String jsonstr)  throws Exception {
         logger.info("Json payload for jdSubmit :   {} ",jsonstr);
         FileUploadResponse response = this.employeeBO.jdSubmit(jsonstr);
         return new ResponseEntity<>(response,HttpStatus.OK);

@@ -68,6 +68,7 @@ public class EmployeeBOImpl implements EmployeeBO {
         return talentResultFinalList;
     }
 
+
     public  Employee candidtateInfo(String employeeId)  throws Exception  {
         File directory = new File("./");
         System.out.println("File Path : =============="+directory.getAbsolutePath());

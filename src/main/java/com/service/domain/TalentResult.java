@@ -46,6 +46,7 @@ public class TalentResult {
         return score;
     }
 
+
     public void setCorporateTitle(String corporateTitle) {
         this.corporateTitle = corporateTitle;
     }

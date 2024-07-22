@@ -5,6 +5,7 @@ import com.service.domain.Employee;
 import com.service.business.EmployeeBO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.util.stream.Stream;
 
+import org.springframework.core.io.Resource;
 
 @RestController
 @RequestMapping("/integrationservice")
@@ -57,12 +63,21 @@ public class IntegrationRestController {
     }
 
 
-    @GetMapping("/candidate-info")
+   /* @GetMapping("/candidate-info")
     public  @ResponseBody ResponseEntity<Employee>  candidtateInfo(@RequestParam("employee-id") String employeeId)
             throws Exception {
         logger.info("Json payload for employeeId :   {} ",employeeId);
         Employee employee = this.employeeBO.candidtateInfo(employeeId);
         return ResponseEntity.ok(employee);
-    }
+    }*/
 
+    @GetMapping("/candidate-info")
+    public   ResponseEntity<?>  candidtateInfo(@RequestParam("employee-id") String employeeId) throws Exception {
+        logger.info("Json payload for employeeId :   {} ",employeeId);
+        Employee employee = this.employeeBO.candidtateInfo(employeeId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("Content-Disposition","attachment; filename="+employee.getCvPath())
+                .contentType(MediaType.valueOf("multipart/mixed"))
+                .body(employee.getBytes());
+    }
 }

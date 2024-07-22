@@ -144,7 +144,7 @@ if selected == "HR Module":
             response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
 
     # df_form1 = pd.concat([df_form,pd.DataFrame([d])], ignore_index=True)   
-    st.write(jd_extracted_json)
+            st.write(jd_extracted_json)
 
 
 if selected == "Talent Marketplace":

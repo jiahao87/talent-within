@@ -156,7 +156,7 @@ if selected == "Talent Marketplace":
     options = [str(jd['id']) + " " + str(jd['jobTitle']) for jd in response_jd_json]
     hiring_manager_dict = {}
     for i, jd_dict in enumerate(response_jd_json):
-        hiring_manager_dict[str(jd_dict['id']) + " " + jd_dict['jobTitle']] = response_jd_json['hiringMmanager'][i]
+        hiring_manager_dict[str(jd_dict['id']) + " " + jd_dict['jobTitle']] = jd_dict['hiringMmanager']
     drp_jobtitle = st.selectbox("Job Title",options,0,)
     output_hiring_mgr = st.text_input("Hiring Manager", hiring_manager_dict[drp_jobtitle], disable=True) #Data to be fed from backend based on job title selected
 

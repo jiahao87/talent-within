@@ -1,0 +1,241 @@
+import streamlit as st
+import base64
+from streamlit_option_menu import option_menu
+from streamlit_extras.app_logo import add_logo
+from streamlit_extras.stylable_container import stylable_container
+from annotated_text import annotated_text
+import pandas as pd
+import random
+import requests
+
+
+st.set_page_config(layout="wide")
+
+add_logo("../assets/images/logo_transparent.png", height=100)
+
+page_bg_img = """
+<style>
+[data-testid="stAppViewContainer"] {
+    background-image : url("https://unsplash.com/photos/a-white-desk-with-a-laptop-and-a-pair-of-glasses-Ahbw0cGz8Nk")
+    background-size : cover
+    background-color: rgba(0,0,0,0)
+}
+
+.st-emotion-cache-5drf04 {
+    height: 5rem;
+    max-width: 15rem;
+    margin: 0rem 0rem 0rem 0rem;
+    z-index: 999990;
+}
+
+[data-testid="stSidebarHeader"] {
+    justify-content: center;
+}
+
+
+
+</style>
+"""
+st.markdown(page_bg_img,unsafe_allow_html=True)
+
+tabs_font_css = """
+<style>
+div[class*="stTextArea"] label {
+  font-size: 26px;
+  color: red;
+}
+
+div[class*="stTextInput"] label {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+div[class*="stNumberInput"] label {
+  font-size: 26px;
+  color: green;
+}
+.reportview-container .main .block-container {{
+    padding-left: 1rem;
+}}
+
+</style>
+"""
+
+st.write(tabs_font_css, unsafe_allow_html=True)
+
+st.logo("../assets/images/logo_transparent.png")
+
+with st.sidebar:
+    selected = option_menu(
+        menu_title = "Menu",
+        options = ["HR Module","Talent Marketplace"],
+        default_index=0,
+    )
+
+d={}
+
+if selected == "HR Module":
+    st.title('Welcome to :blue[HR Module]')
+    st.markdown("**HR Management Portal is designed to support your search of internal candidates and promote internal mobility**")
+    st.image('../assets/images/process.png',width=1100)
+    st.divider()
+    st.markdown(" <style> div[class^='st-emotion-cache-13ln4jf ea3mdgi5'] { padding-left: 0rem; } </style> ", unsafe_allow_html=True)
+    col1, col2 = st.columns([3,2])
+
+    with col1:
+        st.subheader("HR Input")
+        st.write('Please review the details below and submit for internal transfer')
+        def text_field(label, columns=None, **input_params):
+            c1, c2 = st.columns([2,4])
+
+            with c1:
+                    st.markdown("######")
+                    st.write(label)
+    
+            input_params.setdefault("key", label)
+
+            with c2:
+                    return c2.text_input("", **input_params)
+
+
+        job_id = text_field("Job ID")
+        job_title = text_field("Job Title")
+        corp_title = st.selectbox("Corporate Title", ("Analyst", "Associate", "Vice President", "Executive Director", "Managing Director"))
+        h_mgr = text_field("Hiring Manager")
+        loc = text_field("Location")
+        st.markdown("####")
+        st.write('Please upload JD')
+        fl_upload = st.file_uploader("Upload File", type="pdf")
+
+    if fl_upload is not None:
+        upload_jd_endpoint = "http://localhost:8080/integrationservice/jd-upload"
+        files = [("file", (fl_upload.name, fl_upload.getvalue(), 'application/pdf'))]
+        response_jd_upload = requests.request("POST", upload_jd_endpoint, files=files)
+        jd_extracted_json = response_jd_upload.json()
+    with col2:
+        st.subheader("Knowledge, Skills & Abilities (KSA)")
+        with st.container(height=360):
+            if fl_upload is not None:
+                # jd_extracted_json = {}
+                # jd_extracted_json['ksa'] = ["min 3 years of experience", "Database querying", "Oracle 19c", "MSSQL", "UNIX", "Windows", "Financial products", "FX", "Money Market", "Equity", "Derivatives", "Front-to-back operational workflows", "Different technologies", "Avaloq Certification"]
+                options = st.multiselect("Please select and edit the KSA if necessary",
+                                         jd_extracted_json['ksa'],
+                                         jd_extracted_json['ksa'])
+
+    def get_data():
+         return[]
+    
+    df_form = pd.DataFrame(columns=['Job ID','Job Title','Title','Manager'])
+    print(df_form)
+
+    if fl_upload is not None:
+        if st.button("Submit",type="primary"):
+            # d = {'Job ID': [job_id], 
+            #         'Job Title': [job_title],
+            #         'Title': [corp_title],
+            #         'Manager': [h_mgr]}
+            jd_extracted_json['ksa_reviewed'] = list(options.values())
+            jd_extracted_json['job_id'] = job_id
+            jd_extracted_json['job_title'] = job_title
+            jd_extracted_json['corporate_title'] = corp_title
+            jd_extracted_json['country'] = loc
+            jd_extracted_json['hiring_manager'] = h_mgr
+            jd_submit_endpoint = "http://localhost:8080/integrationservice/jd-submit"
+            response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
+
+    # df_form1 = pd.concat([df_form,pd.DataFrame([d])], ignore_index=True)   
+    st.write(jd_extracted_json)
+
+
+if selected == "Talent Marketplace":
+    st.title(f"Welcome to :blue[{selected}]")
+    st.divider()
+    st.subheader('Select your internal candidates')
+    st.write('Job Description')
+    jd_list_endpoint = "http://localhost:8080/integrationservice/jd-list"
+    response_jd_json = requests.get(jd_list_endpoint).json()
+    options = response_jd_json['job_title']
+    job_id_dict = {}
+    hiring_manager_dict = {}
+    for i, title in enumerate(response_jd_json['job_title']):
+        job_id_dict[title] = response_jd_json['job_id'][i]
+        hiring_manager_dict[title] = response_jd_json['hiring_manager'][i]
+    drp_jobtitle = st.selectbox("Job Title",options,0,)
+    output_hiring_mgr = st.text_input("Hiring Manager",hiring_manager_dict[drp_jobtitle], disable=True) #Data to be fed from backend based on job title selected
+
+    col1, col2 = st.columns([3,2])
+
+    with col1:
+        st.subheader('Internal profile recommendation')
+        st.write('Shortlist the candidate for hiring manager review')
+
+        if "df" not in st.session_state:
+            talent_results_endpoint = "http://localhost:8080/integrationservice/talent-results"
+            response_talent_results = requests.get(talent_results_endpoint, params={"job-id": job_id_dict[drp_jobtitle]}).json()
+
+            st.session_state.df = pd.DataFrame(
+                {
+                    "employee_id": response_talent_results['Serial Number'],
+                    "name": [str(m) + str(n) for m,n in zip(response_talent_results['First Name'], response_talent_results['Last Name'])],
+                    "location": response_talent_results['Country'],
+                    "title" : response_talent_results['Global Corporate Title'],
+                    "percentage": response_talent_results['score'],
+                }
+            )
+
+        event = st.dataframe(
+            st.session_state.df,
+            column_config={
+                "employee_id": "Employee ID",
+                "name": "Candidate Name",
+                "location": "Location",
+                "title": "Corp Title",
+                "percentage": "Score",
+            },
+            hide_index=True,
+            key="data",
+            on_select="rerun",
+            selection_mode=["multi-row", "multi-column"],
+            width=500
+        )
+        
+        selected_row = event.selection.rows
+        candidate_id  = st.session_state.df.iloc[selected_row]["employee_id"]
+    
+    with col2:
+        st.markdown(
+                    """
+                <style>
+                [data-testid="baseButton-primary"] {
+                    height: auto;
+                    width: 400px;
+                    padding-top: 10px !important;
+                    padding-bottom: 10px !important;
+                }
+                </style>
+                """,
+                    unsafe_allow_html=True,
+        )
+        with stylable_container(
+            key="container_with_border",
+            css_styles="""
+                {
+                    border: 1px solid rgba(49, 51, 63, 0.2);
+                    border-radius: 0.5rem;
+                    padding: calc(1em - 1px);
+                    background-color: #d4d4d4;
+                    height: 240px
+                }
+                """,
+        ):
+            st.subheader(":red[Candidate KSA]")
+            
+            st.write(st.session_state.df.iloc[selected_row]["name"])
+            st.divider()
+            st.multiselect("",
+                           st.session_state.df.iloc[selected_row]["ksa"],
+                           st.session_state.df.iloc[selected_row]["ksa"], 
+                           disabled=True)
+            st.markdown("#")
+            st.write("Send shortlisted candidate to manager")
+            st.button("Submit", type="primary")

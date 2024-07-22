@@ -14,5 +14,8 @@ dependencies:
   - pip:
     - PyMuPDF
     - PyYAML
+    - streamlit
+    - streamlit-extras
+    - streamlit-option-menu
     # - transformers
     # - torch

@@ -98,3 +98,100 @@ git push -u origin <your branch name>
 ```
 
 Note: Please refer to this [link](https://subscription.packtpub.com/book/cloud-and-networking/9781783986842/2/ch02lvl1sec22/cloning-your-repository-and-pushing-code-to-it) for further explanation on how to push code to GitHub.
+
+
+POST http://localhost:8080/integrationservice/jd-upload
+in postman ->  body ->form-data
+file = file to be uploaded
+
+
+POST http://localhost:8080/integrationservice/jd-submit
+
+{
+    "job_id": "899",
+    "job_title": "Lead Support Analyst",
+    "corporate_title": "Analyst",
+    "country": "Singapore",
+     "hiring_manager": "Datta Ghuge",
+    "job_description": "The Lead Support Analyst is responsible for providing daily application and system support to the International Wealth Management Division (IWM), managing production incidents, liaising with users, and coordinating with internal teams and vendors on system upgrades, release management, and change implementation. They will also participate in business continuity planning and support regional and global projects.",
+ "ksa": [
+        "min 3 years of experience",
+        "Supporting Wealth Management system",
+        "Supporting Order Management system",
+        "Supporting Execution Management System",
+        "Database query including Oracle 19c and MSSQL",
+        "UNIX and Windows operating environments",
+        "Avaloq Certification",
+        "ITIL v3 or similar qualifications",
+        "Market data and financial models",
+        "FIX protocol",
+        "Cloud operations",
+        "Microservices",
+        "Python",
+        "Perl",
+        "Excel",
+        "Communication",
+        "Multitasking",
+        "Prioritization under pressure",
+        "Analytical",
+        "Problem solving",
+        "Willingness to learn",
+        "Ability to adapt to different technologies",
+        "Self-motivated",
+        "Responsible",
+        "Reliable team player",
+        "Financial understanding in FX/MM/Equity/Derivatives",
+        "Front to back operational workflow",
+        "Avaloq Banking System",
+        "English",
+        "Mandarin",
+        "Cantonese"
+    ],
+ "ksa_reviewed": [
+        "min 3 years of experience",
+        "Supporting Wealth Management system",
+        "Supporting Order Management system",
+        "Supporting Execution Management System",
+        "Database query including Oracle 19c and MSSQL",
+        "UNIX and Windows operating environments",
+        "Avaloq Certification",
+        "ITIL v3 or similar qualifications",
+        "Market data and financial models"
+       
+    ],
+    "education": "University graduate",
+    "years_of_experience": "3",
+    "technical_skill": [
+        "Solid experience in supporting Wealth Management system/ Order Management system/ Execution Management System",
+        "Strong knowledge and skills in database query including Oracle 19c and MSSQL",
+        "Good knowledge in UNIX and Windows operating environments",
+        "Completed Avaloq Certification training",
+        "ITIL v3 or similar qualifications",
+        "Knowledge of market data and financial models",
+        "Practical understanding of FIX protocol",
+        "Understanding on cloud operations, microservices, python/perl and excel skill"
+    ],
+    "non_technical_skill": [
+        "Excellent communication skills in English at all levels with the ability to present information in a professional and mature manner",
+        "Ability to multi-task and prioritize under pressure",
+        "Excellent analytical and problem solving skills",
+        "Willing to learn and able to adapt to different technologies",
+        "Self-motivated, responsible and reliable team player"
+    ],
+    "domain_knowledge": [
+        "Demonstrate basic financial understanding in FX/MM/Equity/Derivatives and associated front to back operational workflow",
+        "Good knowledge of Avaloq Banking System"
+    ],
+    "language": [
+        "English",
+        "Mandarin",
+        "Cantonese"
+    ],
+    "filepath": "../data/JD/JD20Jul.pdf"    
+}
+
+
+GET http://localhost:8080/integrationservice/jd-list
+GET http://localhost:8080/integrationservice/talent-results     RequestParam = job-id=899
+GET http://localhost:8080/integrationservice/candidate-info     RequestParam = employee-id=159616
+

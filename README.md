@@ -71,6 +71,12 @@ python talent_api.py
 Upon success, you may visit ```http://0.0.0.0:8502/doc``` to view the FastAPI documentation page, where you can try out the API endpoints.
 ![FastAPI Documentation](assets/images/python_api.png)
 
+9. Open a new Git Bash terminal and follow step 6. Ensure that you change directory to the folder containing the file `talentwithin_UI.py` and execute the command:
+```
+streamlit run talentwithin_UI.py
+```
+Upon success, the streamlit app will open by itself in your default web browser.
+
 ### Steps to Update Local Repository
 
 If you have already cloned the repository to your local environment, you can update your local repository by performing the command in Git Bash terminal:

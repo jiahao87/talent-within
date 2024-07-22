@@ -100,12 +100,15 @@ git push -u origin <your branch name>
 Note: Please refer to this [link](https://subscription.packtpub.com/book/cloud-and-networking/9781783986842/2/ch02lvl1sec22/cloning-your-repository-and-pushing-code-to-it) for further explanation on how to push code to GitHub.
 
 
-POST http://localhost:8080/integrationservice/jd-upload
+
+Java Endpoints : =====================================>
+
+1) POST http://localhost:8080/integrationservice/jd-upload
 in postman ->  body ->form-data
 file = file to be uploaded
 
 
-POST http://localhost:8080/integrationservice/jd-submit
+2) POST http://localhost:8080/integrationservice/jd-submit
 
 {
     "job_id": "899",
@@ -156,8 +159,7 @@ POST http://localhost:8080/integrationservice/jd-submit
         "UNIX and Windows operating environments",
         "Avaloq Certification",
         "ITIL v3 or similar qualifications",
-        "Market data and financial models"
-       
+        "Market data and financial models"       
     ],
     "education": "University graduate",
     "years_of_experience": "3",
@@ -191,7 +193,9 @@ POST http://localhost:8080/integrationservice/jd-submit
 }
 
 
-GET http://localhost:8080/integrationservice/jd-list
-GET http://localhost:8080/integrationservice/talent-results     RequestParam = job-id=899
-GET http://localhost:8080/integrationservice/candidate-info     RequestParam = employee-id=159616
+3) GET http://localhost:8080/integrationservice/jd-list
+
+4) GET http://localhost:8080/integrationservice/talent-results     RequestParam = job-id=899
+   
+5) GET http://localhost:8080/integrationservice/candidate-info     RequestParam = employee-id=159616
 

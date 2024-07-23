@@ -205,7 +205,7 @@ if selected == "Talent Marketplace":
             hide_index=True,
             key="data",
             on_select="rerun",
-            selection_mode=["multi-row", "multi-column"],
+            selection_mode=["single-row"],
             width=500
         )
         

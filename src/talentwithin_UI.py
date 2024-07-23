@@ -161,9 +161,9 @@ if selected == "Talent Marketplace":
     options = [str(jd['id']) + " " + str(jd['jobTitle']) for jd in response_jd_json]
     hiring_manager_dict = {}
     for i, jd_dict in enumerate(response_jd_json):
-        hiring_manager_dict[str(jd_dict['id']) + " " + jd_dict['jobTitle']] = jd_dict['hiringMmanager']
+        hiring_manager_dict[str(jd_dict['id']) + " " + jd_dict['jobTitle']] = jd_dict['hiringManager']
     drp_jobtitle = st.selectbox("Job Title",options,0,)
-    output_hiring_mgr = st.text_input("Hiring Manager", hiring_manager_dict[drp_jobtitle], disable=True) #Data to be fed from backend based on job title selected
+    output_hiring_mgr = st.text_input("Hiring Manager", hiring_manager_dict[drp_jobtitle], disabled=True) #Data to be fed from backend based on job title selected
 
     col1, col2 = st.columns([3,2])
 
@@ -175,7 +175,7 @@ if selected == "Talent Marketplace":
             talent_results_endpoint = "http://localhost:8080/integrationservice/talent-results"
             response_talent_results = requests.get(talent_results_endpoint, params={"job-id": drp_jobtitle.split(" ")[0]}).json()
             talent_results_df = pd.DataFrame(response_talent_results)
-            talent_results_df['name'] = talent_results_df['First Name'] + talent_results_df['Last Name']
+            talent_results_df['name'] = talent_results_df['firstName'] + talent_results_df['lastName']
             st.session_state.df = talent_results_df
             # st.session_state.df = pd.DataFrame(
             #     {

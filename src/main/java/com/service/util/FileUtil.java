@@ -119,6 +119,7 @@ public class FileUtil {
     }
 
     public List<JDDetail>  readJDExcel()  throws Exception{
+        HashMap<Integer, Integer>  jdDetailsMap = new HashMap<Integer,Integer>();
         List<JDDetail> jdDetailList = new ArrayList<JDDetail>();
         FileInputStream file = new FileInputStream(new File(AppConstant.JD_DB_EXCEL_PATH));
         XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -152,7 +153,14 @@ public class FileUtil {
             rowCount++;
         }
         file.close();
-        return jdDetailList;
+        List<JDDetail> jdDetailListNew = new ArrayList<JDDetail>();
+        for ( JDDetail jdDetl : jdDetailList){
+            if (!jdDetailsMap.containsKey(Integer.valueOf(jdDetl.getId()))){
+                jdDetailListNew.add(jdDetl);
+                jdDetailsMap.put(Integer.valueOf(jdDetl.getId()), Integer.valueOf(jdDetl.getId()));
+            }
+        }
+        return jdDetailListNew;
     }
 
     public List<TalentResult>  readTalentResultExcel()  throws Exception{

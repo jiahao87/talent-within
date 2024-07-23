@@ -140,6 +140,7 @@ if selected == "HR Module":
                                             jd_extracted_json['ksa'])
 
     if fl_upload is not None:
+        st.markdown("######")
         if st.button("Submit",type="primary"):
             jd_extracted_json['ksa_reviewed'] = options
             jd_extracted_json['job_id'] = job_id
@@ -148,11 +149,10 @@ if selected == "HR Module":
             jd_extracted_json['country'] = loc
             jd_extracted_json['hiring_manager'] = h_mgr
             jd_submit_endpoint = "http://localhost:8080/integrationservice/jd-submit"
-            response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
-            # talent_matching_endpoint = "http://0.0.0.0:8502/talent-matching"
-            # response_jd_submit = requests.request("POST", talent_matching_endpoint, data=jd_extracted_json)
+            # response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
+            response_jd_submit = requests.post(jd_submit_endpoint, json=jd_extracted_json)
             print(jd_extracted_json)
-            if response_jd_submit.status_code == 200:
+            if response_jd_submit.ok:
                 st.info('JD Submitted Successfully. Please proceed to Talent Marketplace to view results.', icon="ℹ️")
 
 
@@ -239,13 +239,13 @@ if selected == "Talent Marketplace":
         ):
             st.subheader(":red[Candidate KSA]")
             
-            st.write(st.session_state.df.iloc[selected_row]["name"])
+            st.write(st.session_state.df.iloc[selected_row]["name"].values)
             st.divider()
             print("ksa type : ", type(st.session_state.df.iloc[selected_row]["ksa"]))
             print("ksa list : ", st.session_state.df.iloc[selected_row]["ksa"])
             st.multiselect("",
-                           st.session_state.df.iloc[selected_row]["ksa"],
-                           st.session_state.df.iloc[selected_row]["ksa"], 
+                           st.session_state.df.iloc[selected_row]["ksa"].to_list(),
+                           st.session_state.df.iloc[selected_row]["ksa"].to_list(), 
                            disabled=True)
             st.markdown("#")
             st.write("Send shortlisted candidate to manager")

@@ -168,7 +168,7 @@ if selected == "Talent Marketplace":
     for i, jd_dict in enumerate(response_jd_json):
         hiring_manager_dict[str(jd_dict['id']) + " " + jd_dict['jobTitle']] = jd_dict['hiringManager']
     drp_jobtitle = st.selectbox("Job Title",options,0,)
-    output_hiring_mgr = st.text_input("Hiring Manager", hiring_manager_dict[drp_jobtitle], disabled=True) #Data to be fed from backend based on job title selected
+    output_hiring_mgr = st.text_input("Hiring Manager", hiring_manager_dict[drp_jobtitle]) #Data to be fed from backend based on job title selected
 
     col1, col2 = st.columns([3,2])
 
@@ -212,41 +212,41 @@ if selected == "Talent Marketplace":
         candidate_id  = st.session_state.df.iloc[selected_row]["serialNum"]
     
     with col2:
-        st.markdown(
-                    """
-                <style>
-                [data-testid="baseButton-primary"] {
-                    height: auto;
-                    width: 400px;
-                    padding-top: 10px !important;
-                    padding-bottom: 10px !important;
-                }
-                </style>
-                """,
-                    unsafe_allow_html=True,
-        )
-        with stylable_container(
-            key="container_with_border",
-            css_styles="""
-                {
-                    border: 1px solid rgba(49, 51, 63, 0.2);
-                    border-radius: 0.5rem;
-                    padding: calc(1em - 1px);
-                    background-color: #d4d4d4;
-                    height: 240px
-                }
-                """,
-        ):
-            st.subheader(":red[Candidate KSA]")
-            
-            st.write(st.session_state.df.iloc[selected_row]["name"].values)
-            st.divider()
-            print("ksa type : ", type(st.session_state.df.iloc[selected_row]["ksa"]))
-            print("ksa list : ", st.session_state.df.iloc[selected_row]["ksa"])
-            st.multiselect("",
-                           st.session_state.df.iloc[selected_row]["ksa"].to_list(),
-                           st.session_state.df.iloc[selected_row]["ksa"].to_list(), 
-                           disabled=True)
-            st.markdown("#")
-            st.write("Send shortlisted candidate to manager")
-            st.button("Submit", type="primary")
+        if selected_row is not None:
+            st.markdown(
+                        """
+                    <style>
+                    [data-testid="baseButton-primary"] {
+                        height: auto;
+                        width: 400px;
+                        padding-top: 10px !important;
+                        padding-bottom: 10px !important;
+                    }
+                    </style>
+                    """,
+                        unsafe_allow_html=True,
+            )
+            with stylable_container(
+                key="container_with_border",
+                css_styles="""
+                    {
+                        border: 1px solid rgba(49, 51, 63, 0.2);
+                        border-radius: 0.5rem;
+                        padding: calc(1em - 1px);
+                        background-color: #d4d4d4;
+                        height: 240px
+                    }
+                    """,
+            ):
+                st.subheader(":red[Candidate KSA]")
+                
+                st.write(st.session_state.df.iloc[selected_row]["name"].values[0])
+                st.divider()
+                print("ksa type : ", type(st.session_state.df.iloc[selected_row]["ksa"]))
+                print("ksa list : ", st.session_state.df.iloc[selected_row]["ksa"])
+                st.multiselect("",
+                            st.session_state.df.iloc[selected_row]["ksa"].to_list(),
+                            st.session_state.df.iloc[selected_row]["ksa"].to_list())
+                st.markdown("#")
+                st.write("Send shortlisted candidate to manager")
+                st.button("Submit", type="primary")

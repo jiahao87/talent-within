@@ -7,6 +7,7 @@ from annotated_text import annotated_text
 import pandas as pd
 import random
 import requests
+import ast
 
 
 st.set_page_config(layout="wide")
@@ -245,8 +246,8 @@ if selected == "Talent Marketplace":
                 print("ksa type : ", type(st.session_state.df.iloc[selected_row]["ksa"]))
                 print("ksa list : ", st.session_state.df.iloc[selected_row]["ksa"])
                 st.multiselect("",
-                            st.session_state.df.iloc[selected_row]["ksa"].to_list(),
-                            st.session_state.df.iloc[selected_row]["ksa"].to_list())
+                            ast.literal_eval(st.session_state.df.iloc[selected_row]["ksa"].values[0]),
+                            ast.literal_eval(st.session_state.df.iloc[selected_row]["ksa"].values[0]))
                 st.markdown("#")
                 st.write("Send shortlisted candidate to manager")
                 st.button("Submit", type="primary")

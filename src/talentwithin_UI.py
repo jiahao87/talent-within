@@ -139,16 +139,21 @@ if selected == "HR Module":
                                             jd_extracted_json['ksa'],
                                             jd_extracted_json['ksa'])
 
-            if st.button("Submit",type="primary"):
-                jd_extracted_json['ksa_reviewed'] = options
-                jd_extracted_json['job_id'] = job_id
-                jd_extracted_json['job_title'] = job_title
-                jd_extracted_json['corporate_title'] = corp_title
-                jd_extracted_json['country'] = loc
-                jd_extracted_json['hiring_manager'] = h_mgr
-                jd_submit_endpoint = "http://localhost:8080/integrationservice/jd-submit"
-                response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
-                print(jd_extracted_json)
+    if fl_upload is not None:
+        if st.button("Submit",type="primary"):
+            jd_extracted_json['ksa_reviewed'] = options
+            jd_extracted_json['job_id'] = job_id
+            jd_extracted_json['job_title'] = job_title
+            jd_extracted_json['corporate_title'] = corp_title
+            jd_extracted_json['country'] = loc
+            jd_extracted_json['hiring_manager'] = h_mgr
+            # jd_submit_endpoint = "http://localhost:8080/integrationservice/jd-submit"
+            # response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
+            talent_matching_endpoint = "http://0.0.0.0:8502/talent-matching"
+            response_jd_submit = requests.request("POST", talent_matching_endpoint, data=jd_extracted_json)
+            print(jd_extracted_json)
+            if response_jd_submit.status_code == 200:
+                st.info('JD Submitted Successfully. Please proceed to Talent Marketplace to view results.', icon="ℹ️")
 
 
 if selected == "Talent Marketplace":
@@ -188,12 +193,12 @@ if selected == "Talent Marketplace":
             # )
 
         event = st.dataframe(
-            st.session_state.df[["Serial Number", "name", "Country", "Global Corporate Title", "score"]],
+            st.session_state.df[["serialNum", "name", "location", "corporateTitle", "score"]],
             column_config={
-                "Serial Number": "Employee ID",
+                "serialNum": "Employee ID",
                 "name": "Candidate Name",
-                "Country": "Location",
-                "Global Corporate Title": "Corp Title",
+                "location": "Location",
+                "corporateTitle": "Corp Title",
                 "score": "Score",
             },
             hide_index=True,
@@ -204,7 +209,7 @@ if selected == "Talent Marketplace":
         )
         
         selected_row = event.selection.rows
-        candidate_id  = st.session_state.df.iloc[selected_row]["Serial Number"]
+        candidate_id  = st.session_state.df.iloc[selected_row]["serialNum"]
     
     with col2:
         st.markdown(

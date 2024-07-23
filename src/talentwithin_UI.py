@@ -214,40 +214,40 @@ if selected == "Talent Marketplace":
     
     with col2:
         if selected_row:
-            if selected_row[0]>=0:
-                st.markdown(
-                            """
-                        <style>
-                        [data-testid="baseButton-primary"] {
-                            height: auto;
-                            width: 400px;
-                            padding-top: 10px !important;
-                            padding-bottom: 10px !important;
-                        }
-                        </style>
-                        """,
-                            unsafe_allow_html=True,
-                )
-                with stylable_container(
-                    key="container_with_border",
-                    css_styles="""
-                        {
-                            border: 1px solid rgba(49, 51, 63, 0.2);
-                            border-radius: 0.5rem;
-                            padding: calc(1em - 1px);
-                            background-color: #d4d4d4;
-                            height: 240px
-                        }
-                        """,
-                ):
-                    st.subheader(":red[Candidate KSA]")
-                    st.markdown(f"### {st.session_state.df.iloc[selected_row]['name'].values[0]}")
-                    st.divider()
-                    print("ksa type : ", type(st.session_state.df.iloc[selected_row]["ksa"]))
-                    print("ksa list : ", st.session_state.df.iloc[selected_row]["ksa"])
-                    st.multiselect("",
-                                ast.literal_eval(st.session_state.df.iloc[selected_row]["ksa"].values[0]),
-                                ast.literal_eval(st.session_state.df.iloc[selected_row]["ksa"].values[0]))
-                    st.markdown("#")
-                    st.write("Send shortlisted candidate to manager")
-                    st.button("Submit", type="primary")
+
+            st.markdown(
+                        """
+                    <style>
+                    [data-testid="baseButton-primary"] {
+                        height: auto;
+                        width: 400px;
+                        padding-top: 10px !important;
+                        padding-bottom: 10px !important;
+                    }
+                    </style>
+                    """,
+                        unsafe_allow_html=True,
+            )
+            with stylable_container(
+                key="container_with_border",
+                css_styles="""
+                    {
+                        border: 1px solid rgba(49, 51, 63, 0.2);
+                        border-radius: 0.5rem;
+                        padding: calc(1em - 1px);
+                        background-color: #d4d4d4;
+                        height: 240px
+                    }
+                    """,
+            ):
+                st.subheader(":red[Candidate KSA]")
+                st.markdown(f"### {st.session_state.df.iloc[selected_row]['name'].values[0]}")
+                st.divider()
+                print("ksa type : ", type(st.session_state.df.iloc[selected_row]["ksa"]))
+                print("ksa list : ", st.session_state.df.iloc[selected_row]["ksa"])
+                st.multiselect("",
+                            ast.literal_eval(st.session_state.df.iloc[selected_row]["ksa"].values[0]),
+                            ast.literal_eval(st.session_state.df.iloc[selected_row]["ksa"].values[0]))
+                st.markdown("#")
+                st.write("Send shortlisted candidate to manager")
+                st.button("Submit", type="primary")

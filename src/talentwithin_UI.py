@@ -240,8 +240,7 @@ if selected == "Talent Marketplace":
                     """,
             ):
                 st.subheader(":red[Candidate KSA]")
-                
-                st.write(st.session_state.df.iloc[selected_row]["name"].values[0])
+                st.markdown(f"### {st.session_state.df.iloc[selected_row]["name"].values[0]}")
                 st.divider()
                 print("ksa type : ", type(st.session_state.df.iloc[selected_row]["ksa"]))
                 print("ksa list : ", st.session_state.df.iloc[selected_row]["ksa"])

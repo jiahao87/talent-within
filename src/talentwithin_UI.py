@@ -147,10 +147,10 @@ if selected == "HR Module":
             jd_extracted_json['corporate_title'] = corp_title
             jd_extracted_json['country'] = loc
             jd_extracted_json['hiring_manager'] = h_mgr
-            # jd_submit_endpoint = "http://localhost:8080/integrationservice/jd-submit"
-            # response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
-            talent_matching_endpoint = "http://0.0.0.0:8502/talent-matching"
-            response_jd_submit = requests.request("POST", talent_matching_endpoint, data=jd_extracted_json)
+            jd_submit_endpoint = "http://localhost:8080/integrationservice/jd-submit"
+            response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
+            # talent_matching_endpoint = "http://0.0.0.0:8502/talent-matching"
+            # response_jd_submit = requests.request("POST", talent_matching_endpoint, data=jd_extracted_json)
             print(jd_extracted_json)
             if response_jd_submit.status_code == 200:
                 st.info('JD Submitted Successfully. Please proceed to Talent Marketplace to view results.', icon="ℹ️")

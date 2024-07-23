@@ -37,6 +37,9 @@ public class EmployeeBOImpl implements EmployeeBO {
 
 
     public  FileUploadResponse jdSubmit(String payload)  throws Exception  {
+        logger.info("payload :  ============="+payload);
+        payload = payload.replaceAll("'","\"");
+        logger.info("payload after :  ============="+payload);
         String jsonResponse = callAsynchPythonEndpoint( payload, AppConstant.PYTHON_TALENT_MATCHING_ENDPOINT_URL);
         FileUtil fileUtil= new FileUtil();
         String jdId = fileUtil.getStringJsonValueFromString(payload,"$.job_id");
@@ -73,7 +76,6 @@ public class EmployeeBOImpl implements EmployeeBO {
 
     public  Employee candidtateInfo(String employeeId)  throws Exception  {
         File directory = new File("./");
-        System.out.println("File Path : =============="+directory.getAbsolutePath());
         FileUtil fileUtil= new FileUtil();
         List<Employee> candidateList =  fileUtil.readCandidateDetailsExcel();
         for (Employee employee : candidateList ){
@@ -101,7 +103,6 @@ public class EmployeeBOImpl implements EmployeeBO {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<String>(requestJson,headers);
-
         executor.submit(() -> {
             ResponseEntity<String> response = restTemplate.postForEntity(endpointUrl, requestEntity, String.class);
         });

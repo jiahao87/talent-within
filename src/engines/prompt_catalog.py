@@ -98,3 +98,18 @@ Output:
     "Machine Learning": "AI"
 }}
 """
+
+system_prompt_guardrail = """You are a guardrail that verifies the accuracy of the data extracted. Check that the data extracted are grounded in the document.
+Provide an explanation first then output a probability score between 0 and 1, in the JSON format {"explanation": "<fill in explanation in double quoted text>", "score": <fill in numeric score>}.
+* score <= 0.5 : inaccurate or ungrounded data extracted
+* 0.5 < score <= 0.75 : slight inaccuracy or hallucination
+* 0.75 < score <= 1 : high degree of groundedness
+Let's think step by step.
+"""
+
+user_prompt_guardrail = """Data extracted:
+{data_json}
+
+Document:
+{doc}
+"""

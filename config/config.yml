@@ -22,3 +22,4 @@ data:
   cv_data: "../data/cv_data.xlsx"
   jobs_data: "../data/jobs.xlsx"
   results_data: "../data/talent_results.xlsx"
+  guardrails_data: "../data/guardrails_results.xlsx"

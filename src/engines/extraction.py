@@ -62,7 +62,7 @@ class ExtractionEngine:
         print(refined_jd_json)
         if 'years_of_experience' in jd_data_json: 
             ksa_list = ["min " + str(jd_data_json['years_of_experience']) + " years of experience"]
-            del jd_data_json['years_of_experience']
+            # del refined_jd_json['years_of_experience']
         for key in list(refined_jd_json.keys()):
             if isinstance(refined_jd_json[key], (list, tuple)):
                 ksa_list.extend(refined_jd_json[key])

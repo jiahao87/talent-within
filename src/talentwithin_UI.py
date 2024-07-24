@@ -3,7 +3,6 @@ import base64
 from streamlit_option_menu import option_menu
 from streamlit_extras.app_logo import add_logo
 from streamlit_extras.stylable_container import stylable_container
-from streamlit_dynamic_filters import DynamicFilters
 from annotated_text import annotated_text
 import pandas as pd
 import random

@@ -278,7 +278,8 @@ if selected == "Talent Marketplace":
         )
         
         selected_row = event.selection.rows
-        candidate_id  = st.session_state.df.iloc[selected_row]["serialNum"]
+        if not selected_row and len(st.session_state.df)>0:
+            selected_row = [0]
     
     with col2:
         if selected_row:

@@ -3,11 +3,19 @@ import base64
 from streamlit_option_menu import option_menu
 from streamlit_extras.app_logo import add_logo
 from streamlit_extras.stylable_container import stylable_container
+from streamlit_dynamic_filters import DynamicFilters
 from annotated_text import annotated_text
 import pandas as pd
 import random
 import requests
 import ast
+from pathlib import Path
+from pandas.api.types import (
+        is_categorical_dtype,
+        is_datetime64_any_dtype,
+        is_numeric_dtype,
+        is_object_dtype,
+    )
 
 
 st.set_page_config(layout="wide")
@@ -150,7 +158,6 @@ if selected == "HR Module":
             jd_extracted_json['country'] = loc
             jd_extracted_json['hiring_manager'] = h_mgr
             jd_submit_endpoint = "http://localhost:8080/integrationservice/jd-submit"
-            # response_jd_submit = requests.request("POST", jd_submit_endpoint, data=jd_extracted_json)
             response_jd_submit = requests.post(jd_submit_endpoint, json=jd_extracted_json)
             print(jd_extracted_json)
             if response_jd_submit.ok:
@@ -164,6 +171,7 @@ if selected == "Talent Marketplace":
     st.write('Job Description')
     jd_list_endpoint = "http://localhost:8080/integrationservice/jd-list"
     response_jd_json = requests.get(jd_list_endpoint).json()
+    # response_jd_json = [{"id": 123, "jobTitle": "testing", "hiringManager":"abc"}]
     options = [str(jd['id']) + " " + str(jd['jobTitle']) for jd in response_jd_json]
     hiring_manager_dict = {}
     for i, jd_dict in enumerate(response_jd_json):
@@ -171,6 +179,72 @@ if selected == "Talent Marketplace":
     drp_jobtitle = st.selectbox("Job Title",options,0,)
     output_hiring_mgr = st.text_input("Hiring Manager", hiring_manager_dict[drp_jobtitle]) #Data to be fed from backend based on job title selected
 
+    def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Adds a UI on top of a dataframe to let viewers filter columns
+        Args:
+            df (pd.DataFrame): Original dataframe
+        Returns:
+            pd.DataFrame: Filtered dataframe
+        """
+        modify = st.checkbox("Add filters")
+        if not modify:
+            return df
+        df = df.copy()
+        # Try to convert datetimes into a standard format (datetime, no timezone)
+        for col in df.columns:
+            if is_object_dtype(df[col]):
+                try:
+                    df[col] = pd.to_datetime(df[col])
+                except Exception:
+                    pass
+            if is_datetime64_any_dtype(df[col]):
+                df[col] = df[col].dt.tz_localize(None)
+        modification_container = st.container()
+        with modification_container:
+            to_filter_columns = st.multiselect("Filter dataframe on", df.columns)
+            for column in to_filter_columns:
+                left, right = st.columns((1, 20))
+                # Treat columns with < 10 unique values as categorical
+                if is_categorical_dtype(df[column]) or df[column].nunique() < 10:
+                    user_cat_input = right.multiselect(
+                        f"Values for {column}",
+                        df[column].unique(),
+                        default=list(df[column].unique()),
+                    )
+                    df = df[df[column].isin(user_cat_input)]
+                elif is_numeric_dtype(df[column]):
+                    _min = float(df[column].min())
+                    _max = float(df[column].max())
+                    step = (_max - _min) / 100
+                    user_num_input = right.slider(
+                        f"Values for {column}",
+                        min_value=_min,
+                        max_value=_max,
+                        value=(_min, _max),
+                        step=step,
+                    )
+                    df = df[df[column].between(*user_num_input)]
+                elif is_datetime64_any_dtype(df[column]):
+                    user_date_input = right.date_input(
+                        f"Values for {column}",
+                        value=(
+                            df[column].min(),
+                            df[column].max(),
+                        ),
+                    )
+                    if len(user_date_input) == 2:
+                        user_date_input = tuple(map(pd.to_datetime, user_date_input))
+                        start_date, end_date = user_date_input
+                        df = df.loc[df[column].between(start_date, end_date)]
+                else:
+                    user_text_input = right.text_input(
+                        f"Substring or regex in {column}",
+                    )
+                    if user_text_input:
+                        df = df[df[column].astype(str).str.contains(user_text_input)]
+        return df
+    
     col1, col2 = st.columns([3,2])
 
     with col1:
@@ -180,21 +254,15 @@ if selected == "Talent Marketplace":
         if "df" not in st.session_state:
             talent_results_endpoint = "http://localhost:8080/integrationservice/talent-results"
             response_talent_results = requests.get(talent_results_endpoint, params={"job-id": drp_jobtitle.split(" ")[0]}).json()
+            # response_talent_results = [{"firstName": "hello", "lastName": "world", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.8999, "ksa": "['python', '3 years of experience', 'NLP']"},
+            #                            {"firstName": "world", "lastName": "hello", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.8999, "ksa": "['perl', '5 years of experience', 'NLP']"}]
             talent_results_df = pd.DataFrame(response_talent_results)
-            talent_results_df['name'] = talent_results_df['firstName'] + talent_results_df['lastName']
+            talent_results_df['score'] = talent_results_df['score'].map('{:.0%}'.format)
+            talent_results_df['name'] = talent_results_df['firstName'] + " " + talent_results_df['lastName']
             st.session_state.df = talent_results_df
-            # st.session_state.df = pd.DataFrame(
-            #     {
-            #         "employee_id": response_talent_results['Serial Number'],
-            #         "name": [str(m) + str(n) for m,n in zip(response_talent_results['First Name'], response_talent_results['Last Name'])],
-            #         "location": response_talent_results['Country'],
-            #         "title" : response_talent_results['Global Corporate Title'],
-            #         "percentage": response_talent_results['score'],
-            #     }
-            # )
 
         event = st.dataframe(
-            st.session_state.df[["serialNum", "name", "location", "corporateTitle", "score"]],
+            filter_dataframe(st.session_state.df[["serialNum", "name", "location", "corporateTitle", "score"]]),
             column_config={
                 "serialNum": "Employee ID",
                 "name": "Candidate Name",
@@ -206,7 +274,7 @@ if selected == "Talent Marketplace":
             key="data",
             on_select="rerun",
             selection_mode=["single-row"],
-            width=500
+            use_container_width=True
         )
         
         selected_row = event.selection.rows
@@ -242,10 +310,14 @@ if selected == "Talent Marketplace":
             ):
                 st.subheader(":red[Candidate KSA]")
                 st.markdown(f"### {st.session_state.df.iloc[selected_row]['name'].values[0]}")
+
+                candidate_info_endpoint = "http://localhost:8080/integrationservice/candidate-info"
+                response_candidate_cv = requests.get(candidate_info_endpoint, params={"employee-id": st.session_state.df.iloc[selected_row]['serialNum'].values[0]})
+                file = response_candidate_cv.content
+                st.download_button("Download CV", file, file_name=st.session_state.df.iloc[selected_row]['name'].values[0]+".pdf", mime="application/pdf")
                 st.divider()
-                print("ksa type : ", type(st.session_state.df.iloc[selected_row]["ksa"]))
-                print("ksa list : ", st.session_state.df.iloc[selected_row]["ksa"])
-                st.multiselect("",
+                container_col1, container_col2 = st.columns([15, 1])
+                container_col1.multiselect("",
                             ast.literal_eval(st.session_state.df.iloc[selected_row]["ksa"].values[0]),
                             ast.literal_eval(st.session_state.df.iloc[selected_row]["ksa"].values[0]))
                 st.markdown("#")

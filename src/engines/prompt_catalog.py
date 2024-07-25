@@ -113,3 +113,32 @@ user_prompt_guardrail = """Data extracted:
 Document:
 {doc}
 """
+
+system_prompt_cv_summarize = """You are an experienced recruiter. Read the candidate's resume below. 
+Summarize the candidate's profile in 1 line. Ignore soft skills like good teamwork and analytical skill.
+
+Example of a candidate profile summary:
+Database query, Excel, MSSQL, Oracle 19c, Perl, Python
+
+Follow the format below.
+Summary:
+<fill in ALL candidate technical skills, certifications, domain knowledge in alphabetical order>
+"""
+
+user_prompt_cv_summarize = """Resume:
+{cv}
+"""
+
+system_prompt_hypothetical_cv = """You are an experienced recruiter. Read the job description below. Draft the profile of a great candidate who will fit the job description. 
+The profile should be 1 line. Ignore soft skills like good teamwork and analytical skill.
+
+Example of a hypothetical candidate profile:
+Database query, Excel, MSSQL, Oracle 19c, Perl, Python
+
+Output Format:
+<fill in hypothetical candidate's technical skills, certifications, domain knowledge in alphabetical order>
+"""
+
+user_prompt_hypothetical_cv = """Job Description:
+{job_description}
+"""

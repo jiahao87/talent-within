@@ -4,6 +4,9 @@ import json
 import re
 import os
 from openpyxl import load_workbook
+import numpy as np
+from numpy.linalg import norm
+import ast
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -14,9 +17,10 @@ corporate_title_mapping = {"analyst": 1, "associate": 2, "vice president": 3, "e
 
 
 class ScoringEngine:
-    def __init__(self, config, llm):
+    def __init__(self, config, llm, embedding_model):
         self.config = config
         self.llm = llm
+        self.embedding_model = embedding_model
         self.cv_data_df = pd.read_excel(config['data']['cv_data'])
         self.employees_df = pd.read_excel(config['data']['employees_master_data'])
         self.employees_df = self.employees_df.loc[self.employees_df['Open to internal transfer']=="Yes"]
@@ -43,7 +47,7 @@ class ScoringEngine:
         self.save_extracted_data(candidate_results_df)
         return candidates_results    
 
-    def preliminary_filtering(self, jd_details):
+    def preliminary_filtering(self, jd_details, k=20):
         candidates_prelim_df = self.employees_df.loc[(self.employees_df['Mobility']>=0.5) | (self.employees_df['Country']==jd_details["country"])]
         candidates_prelim_df['corporate_title_value'] = candidates_prelim_df['Global Corporate Title'].str.lower().map(corporate_title_mapping)
         jd_details['corporate_title_value'] = corporate_title_mapping[jd_details["corporate_title"].lower()]
@@ -51,10 +55,15 @@ class ScoringEngine:
         candidates_prelim_df = candidates_prelim_df.loc[(candidates_prelim_df['corporate_title_diff']==0) | (candidates_prelim_df['corporate_title_diff']==-1)]
         candidates_prelim_df = candidates_prelim_df.merge(self.cv_data_df, left_on="Serial Number", right_on="employee_id", how="left")
         candidates_prelim_df = candidates_prelim_df.loc[candidates_prelim_df['years_of_experience']>=int(jd_details["years_of_experience"])]
+
+        jd_embedding = self.embed_jd(jd_details)
+        candidates_prelim_df['similarity_score'] = candidates_prelim_df['embedding'].apply(lambda x: self.calculate_similarity_score(ast.literal_eval(x), jd_embedding))
+        candidates_prelim_df.sort_values(by="similarity_score", ascending=False, inplace=True)
         candidates_prelim_df = candidates_prelim_df[["Serial Number", "First Name", "Last Name", "Division Org", "Product 1  Org", "Country", 
                                                      "Global Corporate Title", "Job Code Description", "education", "job_history", "technical_skill", 
                                                      "certification", "language_proficiency", "language", "manager_ratings", "last_hire_date", "filepath"]]
-        return candidates_prelim_df
+        
+        return candidates_prelim_df[:k]
     
     def score_candidate(self, jd_details, candidate_data):
         jd = "Job Title: " + jd_details['job_title'] + "\n" + jd_details['job_description']
@@ -140,3 +149,14 @@ class ScoringEngine:
             
         else:
             df.to_excel(output_path, sheet_name=sheetname, index=False)
+
+    def embed_jd(self, jd):
+        system_prompt = system_prompt_hypothetical_cv
+        user_prompt = user_prompt_hypothetical_cv.format(job_description=str(jd))
+        hypothetical_cv = self.llm.generate(user_prompt, system_prompt)
+        jd_embedding = self.embedding_model.embed(hypothetical_cv)
+        return jd_embedding
+
+    def calculate_similarity_score(self, cv_embedding, jd_embedding):
+        cosine = np.dot(jd_embedding,cv_embedding)/(norm(jd_embedding)*norm(cv_embedding))
+        return cosine

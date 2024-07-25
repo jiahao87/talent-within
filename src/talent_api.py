@@ -5,6 +5,7 @@ import uvicorn
 import os
 
 from engines.llm_generator import Generator
+from engines.embedding import Embedding
 from engines.extraction import ExtractionEngine
 from engines.scoring import ScoringEngine
 from engines.guardrails import Guardrails
@@ -17,8 +18,9 @@ load_env_var()
 app = FastAPI(docs_url="/doc")
 
 llm_generator = Generator(config)
-extraction_engine = ExtractionEngine(config, llm_generator)
-scoring_engine = ScoringEngine(config, llm_generator)
+embedding_model = Embedding(config)
+extraction_engine = ExtractionEngine(config, llm_generator, embedding_model)
+scoring_engine = ScoringEngine(config, llm_generator, embedding_model)
 guardrails = Guardrails(config, llm_generator)
 
 

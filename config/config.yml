@@ -16,6 +16,9 @@ model:
     temperature: 0.01 # Temperature setting of LLM
     top_p: 0.9
     top_k: 1
+  embedding:
+    region_name: "us-east-1"
+    model_id: "amazon.titan-embed-text-v1"
 
 data:
   employees_master_data: "../data/master_data.xlsx"

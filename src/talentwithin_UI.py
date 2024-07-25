@@ -205,7 +205,7 @@ if selected == "Talent Marketplace":
             for column in to_filter_columns:
                 left, right = st.columns((1, 20))
                 # Treat columns with < 10 unique values as categorical
-                if is_categorical_dtype(df[column]) or df[column].nunique() < 10:
+                if is_categorical_dtype(df[column]) or df[column].nunique() < 2:
                     user_cat_input = right.multiselect(
                         f"Values for {column}",
                         df[column].unique(),
@@ -254,20 +254,21 @@ if selected == "Talent Marketplace":
             talent_results_endpoint = "http://localhost:8080/integrationservice/talent-results"
             response_talent_results = requests.get(talent_results_endpoint, params={"job-id": drp_jobtitle.split(" ")[0]}).json()
             # response_talent_results = [{"firstName": "hello", "lastName": "world", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.8999, "ksa": "['python', '3 years of experience', 'NLP']"},
-            #                            {"firstName": "world", "lastName": "hello", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.8999, "ksa": "['perl', '5 years of experience', 'NLP']"}]
+            #                            {"firstName": "world", "lastName": "hello", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.7999, "ksa": "['perl', '5 years of experience', 'NLP']"}]
             talent_results_df = pd.DataFrame(response_talent_results)
-            talent_results_df['score'] = talent_results_df['score'].map('{:.0%}'.format)
-            talent_results_df['name'] = talent_results_df['firstName'] + " " + talent_results_df['lastName']
+            talent_results_df['Score %'] = (pd.to_numeric(talent_results_df['score']) * 100).astype(int)
+            talent_results_df['Candidate Name'] = talent_results_df['firstName'] + " " + talent_results_df['lastName']
+            talent_results_df.rename(columns={'serialNum':"Employee ID", "corporateTitle": "Corp Title"}, inplace=True)
             st.session_state.df = talent_results_df
 
         event = st.dataframe(
-            filter_dataframe(st.session_state.df[["serialNum", "name", "location", "corporateTitle", "score"]]),
+            filter_dataframe(st.session_state.df[["Employee ID", "Candidate Name", "location", "Corp Title", "Score %"]]),
             column_config={
-                "serialNum": "Employee ID",
-                "name": "Candidate Name",
+                "Employee ID": "Employee ID",
+                "Candidate Name": "Candidate Name",
                 "location": "Location",
-                "corporateTitle": "Corp Title",
-                "score": "Score",
+                "Corp Title": "Corp Title",
+                "Score %": "Score %",
             },
             hide_index=True,
             key="data",
@@ -309,12 +310,13 @@ if selected == "Talent Marketplace":
                     """,
             ):
                 st.subheader(":red[Candidate KSA]")
-                st.markdown(f"### {st.session_state.df.iloc[selected_row]['name'].values[0]}")
+                st.markdown(f"### {st.session_state.df.iloc[selected_row]['Candidate Name'].values[0]}")
 
                 candidate_info_endpoint = "http://localhost:8080/integrationservice/candidate-info"
-                response_candidate_cv = requests.get(candidate_info_endpoint, params={"employee-id": st.session_state.df.iloc[selected_row]['serialNum'].values[0]})
+                response_candidate_cv = requests.get(candidate_info_endpoint, params={"employee-id": st.session_state.df.iloc[selected_row]['Employee ID'].values[0]})
                 file = response_candidate_cv.content
-                st.download_button("Download CV", file, file_name=st.session_state.df.iloc[selected_row]['name'].values[0]+".pdf", mime="application/pdf")
+                # file = ""
+                st.download_button("Download CV", file, file_name=st.session_state.df.iloc[selected_row]['Candidate Name'].values[0]+".pdf", mime="application/pdf")
                 st.divider()
                 container_col1, container_col2 = st.columns([15, 1])
                 container_col1.multiselect("",

@@ -69,7 +69,7 @@ user_prompt_cv_experience = """Job history:
 system_prompt_relevant_experience = """You are an experienced recruiter. Read the job description and the candidate's job history below. Calculate the candidate's total number of relevant years of experience. Ignore internships and teaching/research roles.
 Check whether the company is Nomura. If not, assume "Present" is {last_hire_date}, else present is {now}.
 Consider whether the candidate's job experience is relevant, if not relevant, years of experience is 0.
-Provide final answer in the format {{"years_of_experience": }}.Think step by step.
+Provide final answer in the JSON format {{"years_of_experience": <fill in numeric number>}}.Think step by step.
 """
 
 user_prompt_relevant_experience = """Job Description:

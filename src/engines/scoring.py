@@ -28,12 +28,15 @@ class ScoringEngine:
         candidates_results = []
         candidates_list = candidates_df['Serial Number'].to_list()
         for candidate in candidates_list:
-            candidate_data = json.loads(candidates_df.loc[candidates_df['Serial Number']==candidate].to_json(orient="records"))[0]
-            score, ksa_list = self.score_candidate(jd_details, candidate_data)
-            candidate_data['score'] = score
-            candidate_data['ksa'] = ksa_list
-            candidate_data.pop('job_history', None)
-            candidates_results.append(candidate_data)
+            try:
+                candidate_data = json.loads(candidates_df.loc[candidates_df['Serial Number']==candidate].to_json(orient="records"))[0]
+                score, ksa_list = self.score_candidate(jd_details, candidate_data)
+                candidate_data['score'] = score
+                candidate_data['ksa'] = ksa_list
+                candidate_data.pop('job_history', None)
+                candidates_results.append(candidate_data)
+            except:
+                continue
         candidate_results_df = pd.DataFrame(candidates_results)
         candidate_results_df['job_id'] = str(jd_details["job_id"])
         candidate_results_df.sort_values(by="score", ascending=False, inplace=True)
@@ -89,10 +92,13 @@ class ScoringEngine:
         match = re.findall(pattern, experience_str)
         if match:
             years_of_experience_str = match[-1]
-            years_of_experience_json = json.loads(years_of_experience_str)
-            years_of_experience = years_of_experience_json['years_of_experience']
+            try:
+                years_of_experience_json = json.loads(years_of_experience_str)
+                years_of_experience = years_of_experience_json['years_of_experience']
+            except:
+                years_of_experience = 0
         else:
-            years_of_experience = None
+            years_of_experience = 0
         return years_of_experience
     
     @staticmethod

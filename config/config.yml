@@ -19,6 +19,7 @@ model:
   embedding:
     region_name: "us-east-1"
     model_id: "amazon.titan-embed-text-v1"
+    top_n: 20
 
 data:
   employees_master_data: "../data/master_data.xlsx"

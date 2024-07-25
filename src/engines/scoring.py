@@ -28,7 +28,7 @@ class ScoringEngine:
         self.process_languages()
 
     def score_all_candidates(self, jd_details):
-        candidates_df = self.preliminary_filtering(jd_details)
+        candidates_df = self.preliminary_filtering(jd_details, self.config['model']['embedding']['top_n'])
         candidates_results = []
         candidates_list = candidates_df['Serial Number'].to_list()
         for candidate in candidates_list:
@@ -47,7 +47,7 @@ class ScoringEngine:
         self.save_extracted_data(candidate_results_df)
         return candidates_results    
 
-    def preliminary_filtering(self, jd_details, k=20):
+    def preliminary_filtering(self, jd_details, top_n=20):
         candidates_prelim_df = self.employees_df.loc[(self.employees_df['Mobility']>=0.5) | (self.employees_df['Country']==jd_details["country"])]
         candidates_prelim_df['corporate_title_value'] = candidates_prelim_df['Global Corporate Title'].str.lower().map(corporate_title_mapping)
         jd_details['corporate_title_value'] = corporate_title_mapping[jd_details["corporate_title"].lower()]
@@ -63,7 +63,7 @@ class ScoringEngine:
                                                      "Global Corporate Title", "Job Code Description", "education", "job_history", "technical_skill", 
                                                      "certification", "language_proficiency", "language", "manager_ratings", "last_hire_date", "filepath"]]
         
-        return candidates_prelim_df[:k]
+        return candidates_prelim_df[:top_n]
     
     def score_candidate(self, jd_details, candidate_data):
         jd = "Job Title: " + jd_details['job_title'] + "\n" + jd_details['job_description']

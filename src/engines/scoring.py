@@ -29,8 +29,8 @@ class ScoringEngine:
 
     def score_all_candidates(self, jd_details):
         candidates_df = self.preliminary_filtering(jd_details, self.config['model']['embedding']['top_n'])
-        candidates_results = []
         candidates_list = candidates_df['Serial Number'].to_list()
+        candidates_results = []
         for candidate in candidates_list:
             try:
                 candidate_data = json.loads(candidates_df.loc[candidates_df['Serial Number']==candidate].to_json(orient="records"))[0]
@@ -39,12 +39,13 @@ class ScoringEngine:
                 candidate_data['ksa'] = ksa_list
                 candidate_data.pop('job_history', None)
                 candidates_results.append(candidate_data)
+                candidate_results_df = pd.DataFrame(candidates_results)
+                candidate_results_df['job_id'] = str(jd_details["job_id"])
+                candidate_results_df.sort_values(by="score", ascending=False, inplace=True)
+                self.save_extracted_data(candidate_results_df)
             except:
                 continue
-        candidate_results_df = pd.DataFrame(candidates_results)
-        candidate_results_df['job_id'] = str(jd_details["job_id"])
-        candidate_results_df.sort_values(by="score", ascending=False, inplace=True)
-        self.save_extracted_data(candidate_results_df)
+        
         return candidates_results    
 
     def preliminary_filtering(self, jd_details, top_n=20):

@@ -15,7 +15,12 @@ from pandas.api.types import (
         is_numeric_dtype,
         is_object_dtype,
     )
+import os
 
+from utils.load_config import load_config
+
+
+config = load_config()
 
 st.set_page_config(layout="wide")
 
@@ -100,10 +105,22 @@ if selected == "HR Module":
         job_title_predefined = None
         location_predefined = None
 
+        @st.cache_resource
+        def save_uploaded_file(file, filepath):
+            with open(filepath, mode='wb') as w:
+                w.write(file.getvalue())
+
+        @st.cache_data
+        def call_jd_extraction_endpoint(filepath):
+            upload_jd_endpoint = "http://localhost:8502/extract-jd"
+            response_jd_upload = requests.post(upload_jd_endpoint, json={"filepath": filepath})
+            return response_jd_upload
+
         if fl_upload is not None:
-            upload_jd_endpoint = "http://localhost:8080/integrationservice/jd-upload"
-            files = [("file", (fl_upload.name, fl_upload.getvalue(), 'application/pdf'))]
-            response_jd_upload = requests.request("POST", upload_jd_endpoint, files=files)
+            file_path = os.path.join(config["data"]["jd_folder"], fl_upload.name)
+            save_uploaded_file(fl_upload, file_path)
+
+            response_jd_upload = call_jd_extraction_endpoint(file_path)
             jd_extracted_json = response_jd_upload.json()
             job_id_predefined = jd_extracted_json['job_id']
             job_title_predefined = jd_extracted_json['job_title']
@@ -111,6 +128,7 @@ if selected == "HR Module":
 
             st.markdown("######")
             st.write('Please review/input the details below and submit for internal transfer')
+
             def text_field(label, input_type="text", label_visibility="hidden", **input_params):
                 c1, c2 = st.columns([2,4])
 
@@ -156,11 +174,17 @@ if selected == "HR Module":
             jd_extracted_json['corporate_title'] = corp_title
             jd_extracted_json['country'] = loc
             jd_extracted_json['hiring_manager'] = h_mgr
-            jd_submit_endpoint = "http://localhost:8080/integrationservice/jd-submit"
-            response_jd_submit = requests.post(jd_submit_endpoint, json=jd_extracted_json)
-            print(jd_extracted_json)
-            if response_jd_submit.ok:
-                st.info('JD Submitted Successfully. Please proceed to Talent Marketplace to view results.', icon="ℹ️")
+            if not h_mgr:
+                st.warning("Please fill in hiring manager's name", icon="⚠️")
+            else:
+                jd_submit_endpoint = "http://localhost:8502/submit-jd"
+                response_jd_submit = requests.post(jd_submit_endpoint, json=jd_extracted_json)
+
+                talent_matching_endpoint = "http://localhost:8502/talent-matching"
+                response_talent_matching = requests.post(talent_matching_endpoint, json=jd_extracted_json)
+                print(jd_extracted_json)
+                if response_talent_matching.ok:
+                    st.info('JD Submitted Successfully. Please proceed to Talent Marketplace to view results.', icon="ℹ️")
 
 
 if selected == "Talent Marketplace":
@@ -168,13 +192,13 @@ if selected == "Talent Marketplace":
     st.divider()
     st.subheader('Select your internal candidates')
     st.write('Job Description')
-    jd_list_endpoint = "http://localhost:8080/integrationservice/jd-list"
+    jd_list_endpoint = "http://localhost:8502/list-jd"
     response_jd_json = requests.get(jd_list_endpoint).json()
-    # response_jd_json = [{"id": 123, "jobTitle": "testing", "hiringManager":"abc"}]
-    options = [str(jd['id']) + " " + str(jd['jobTitle']) for jd in response_jd_json]
+    # response_jd_json = [{"job_id": "123", "job_title": "testing", "hiring_manager":"abc"}]
+    options = [str(jd['job_id']) + " " + str(jd['job_title']) for jd in response_jd_json]
     hiring_manager_dict = {}
     for i, jd_dict in enumerate(response_jd_json):
-        hiring_manager_dict[str(jd_dict['id']) + " " + jd_dict['jobTitle']] = jd_dict['hiringManager']
+        hiring_manager_dict[str(jd_dict['job_id']) + " " + jd_dict['job_title']] = jd_dict['hiring_manager']
     drp_jobtitle = st.selectbox("Job Title",options,0,)
     output_hiring_mgr = st.text_input("Hiring Manager", hiring_manager_dict[drp_jobtitle]) #Data to be fed from backend based on job title selected
 
@@ -250,34 +274,39 @@ if selected == "Talent Marketplace":
         st.subheader('Internal profile recommendation')
         st.write('Shortlist the candidate for hiring manager review')
 
-        if "df" not in st.session_state:
-            talent_results_endpoint = "http://localhost:8080/integrationservice/talent-results"
-            response_talent_results = requests.get(talent_results_endpoint, params={"job-id": drp_jobtitle.split(" ")[0]}).json()
-            # response_talent_results = [{"firstName": "hello", "lastName": "world", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.8999, "ksa": "['python', '3 years of experience', 'NLP']"},
-            #                            {"firstName": "world", "lastName": "hello", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.7999, "ksa": "['perl', '5 years of experience', 'NLP']"}]
-            talent_results_df = pd.DataFrame(response_talent_results)
+        st.session_state.df = []
+        talent_results_endpoint = "http://localhost:8502/talent-results"
+        response_talent_results = requests.get(talent_results_endpoint, params={"id": drp_jobtitle.split(" ")[0]}).json()
+        # response_talent_results = [{"firstName": "hello", "lastName": "world", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.8999, "ksa": "['python', '3 years of experience', 'NLP']"},
+        #                            {"firstName": "world", "lastName": "hello", "serialNum":"321", "location": "SG", "corporateTitle":"analyst", "score":0.7999, "ksa": "['perl', '5 years of experience', 'NLP']"}]
+        talent_results_df = pd.DataFrame(response_talent_results)
+        if len(talent_results_df)>0:
+            talent_results_df.sort_values(by="score", ascending=False, inplace=True)
             talent_results_df['Score %'] = (pd.to_numeric(talent_results_df['score']) * 100).astype(int)
-            talent_results_df['Candidate Name'] = talent_results_df['firstName'] + " " + talent_results_df['lastName']
-            talent_results_df.rename(columns={'serialNum':"Employee ID", "corporateTitle": "Corp Title"}, inplace=True)
+            talent_results_df['Candidate Name'] = talent_results_df['First Name'] + " " + talent_results_df['Last Name']
+            talent_results_df.rename(columns={'Serial Number':"Employee ID", "Global Corporate Title": "Corp Title", "Country": "Location"}, inplace=True)
             st.session_state.df = talent_results_df
 
-        event = st.dataframe(
-            filter_dataframe(st.session_state.df[["Employee ID", "Candidate Name", "location", "Corp Title", "Score %"]]),
-            column_config={
-                "Employee ID": "Employee ID",
-                "Candidate Name": "Candidate Name",
-                "location": "Location",
-                "Corp Title": "Corp Title",
-                "Score %": "Score %",
-            },
-            hide_index=True,
-            key="data",
-            on_select="rerun",
-            selection_mode=["single-row"],
-            use_container_width=True
-        )
-        
-        selected_row = event.selection.rows
+            event = st.dataframe(
+                filter_dataframe(st.session_state.df[["Employee ID", "Candidate Name", "Location", "Corp Title", "Score %"]]),
+                column_config={
+                    "Employee ID": "Employee ID",
+                    "Candidate Name": "Candidate Name",
+                    "Location": "Location",
+                    "Corp Title": "Corp Title",
+                    "Score %": "Score %",
+                },
+                hide_index=True,
+                key="data",
+                on_select="rerun",
+                selection_mode=["single-row"],
+                use_container_width=True
+            )
+            
+            selected_row = event.selection.rows
+        else:
+            selected_row = None
+
         if not selected_row and len(st.session_state.df)>0:
             selected_row = [0]
     
@@ -312,8 +341,8 @@ if selected == "Talent Marketplace":
                 st.subheader(":red[Candidate KSA]")
                 st.markdown(f"### {st.session_state.df.iloc[selected_row]['Candidate Name'].values[0]}")
 
-                candidate_info_endpoint = "http://localhost:8080/integrationservice/candidate-info"
-                response_candidate_cv = requests.get(candidate_info_endpoint, params={"employee-id": st.session_state.df.iloc[selected_row]['Employee ID'].values[0]})
+                candidate_info_endpoint = "http://localhost:8502/candidate-info"
+                response_candidate_cv = requests.get(candidate_info_endpoint, params={"id": st.session_state.df.iloc[selected_row]['Employee ID'].values[0]})
                 file = response_candidate_cv.content
                 # file = ""
                 st.download_button("Download CV", file, file_name=st.session_state.df.iloc[selected_row]['Candidate Name'].values[0]+".pdf", mime="application/pdf")

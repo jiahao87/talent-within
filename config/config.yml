@@ -22,6 +22,7 @@ model:
     top_n: 20
 
 data:
+  jd_folder: "../data/JD"
   employees_master_data: "../data/master_data.xlsx"
   cv_data: "../data/cv_data.xlsx"
   jobs_data: "../data/jobs.xlsx"

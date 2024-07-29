@@ -1,7 +1,10 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, BackgroundTasks
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
+import pandas as pd
 from typing import List
 import uvicorn
+import json
 import os
 
 from engines.llm_generator import Generator
@@ -56,6 +59,28 @@ def extract_jd(filepath: Filepath):
     jd_json = extraction_engine.extract_jd(filepath.filepath)
     return jd_json
 
+@app.post("/submit-jd")
+def submit_jd(jd_details: JDdetails):
+
+    output_path=config['data']['jobs_data']
+
+    if os.path.exists(output_path):
+        original_df = pd.read_excel(output_path, dtype={'job_id': str})
+        existing_job_ids = list(original_df['job_id'].unique())
+        results_job_id = str(jd_details.job_id)
+        if results_job_id in existing_job_ids:
+            original_df = original_df.loc[original_df['job_id']!=results_job_id].reset_index(drop=True)
+        new_df = pd.concat([original_df, pd.DataFrame([jd_details.dict()])])
+
+        new_df.to_excel(output_path, sheet_name="jd_details", index=False)
+        
+    else:
+        pd.DataFrame([jd_details.dict()]).to_excel(output_path, sheet_name="jd_details", index=False)
+
+@app.get("/list-jd")
+def get_jd_list():
+    jd_df = pd.read_excel(config["data"]["jobs_data"], usecols=["job_id", "job_title", "hiring_manager"])
+    return json.loads(jd_df.to_json(orient="records"))
 
 @app.post("/extract-cv")
 def extract_cv(filepath: Filepath):   
@@ -68,9 +93,22 @@ def extract_all_cv():
     return cv_json
 
 @app.post("/talent-matching")
-def talent_matching(jd: JDdetails):
-    candidate_results = scoring_engine.score_all_candidates(jd.dict())
+def talent_matching(jd: JDdetails, background_tasks: BackgroundTasks):
+    background_tasks.add_task(scoring_engine.score_all_candidates, jd.dict())
+    # candidate_results = scoring_engine.score_all_candidates(jd.dict())
     return status.HTTP_200_OK
+
+@app.get("/talent-results")
+def get_talent_results(id: str):
+    talent_results_df = pd.read_excel(config["data"]["results_data"], dtype={'job_id': str, 'Serial Number': str})
+    talent_results_df = talent_results_df.loc[talent_results_df['job_id']==id]
+    return json.loads(talent_results_df.to_json(orient="records"))
+
+@app.get("/candidate-info")
+def get_cv_file(id: str):
+    cv_df = pd.read_excel(config["data"]["cv_data"], dtype={"employee_id": str})
+    file_path = cv_df.loc[cv_df['employee_id']==id]['filepath'].values[0]
+    return FileResponse(path=file_path, filename=file_path, media_type='application/pdf')
 
 @app.post("/guardrails_check")
 def guardrails_check():
